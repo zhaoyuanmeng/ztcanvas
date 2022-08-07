@@ -12,7 +12,7 @@ export interface EventBase {
 }
 
 /**
- * EventHandler 基类
+ * EventHandler 基类（抽象类） 这个是思想的核心应用（很厉害结构很清晰）
  */
 export abstract class BaseEventHandler {
   abstract eventName: EventName

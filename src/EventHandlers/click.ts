@@ -5,6 +5,7 @@ import type { TriggerReturnType } from './base'
 import { BaseEventHandler } from './base'
 import { getCanvasCheckApi } from './helper'
 
+// 这个类是为了实现事件系统的具体实现 (设计风格有点像vue3的reactive)
 export class ClickEventHandler extends BaseEventHandler {
   eventName = EventName.click
 
@@ -12,15 +13,30 @@ export class ClickEventHandler extends BaseEventHandler {
     super(engine)
   }
 
+  /**
+   * @author Zhao YuanDa
+   * @parms:
+   * @description: //事件收集函数
+   * @date 2022-08-07 10:02
+   */
   track(shape: ShapeClassType, cbFn: EventFn): void {
+    // 刚进来的时候 先初始化监听
     if (!this.events.length) this.initDomEventListener()
+    // 然后调用tirgger函数
     const fn = this.trigger(shape, cbFn)
+    // 然后存放到公用的events中
     this.events.push({
       shape,
       handler: fn,
     })
   }
 
+  /**
+   * @author Zhao YuanDa
+   * @parms:
+   * @description: //事件触发函数  返回一个函数 这个函数就是事件回调函数
+   * @date 2022-08-07 10:02
+   */
   trigger(shape: ShapeClassType, cbFn: EventFn): TriggerReturnType {
     return (e: MouseEvent) => {
       this.engine.updateCanvasOffset()

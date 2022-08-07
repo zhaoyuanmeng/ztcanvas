@@ -65,11 +65,15 @@ export class CanvasEngine {
   private eventHandler
 
   constructor(public options: CanvasEngineProps) {
+    // 这一步就是初始化canvas的大小 还有偏移量
     this.initCanvasSize(options)
+    // 获取操作canvas2d上下文的环境
     this.initCtx()
+    // 这个是核心 初始化事件系统 这个this就是实例本身了
     this.eventHandler = new EventHandler(this)
   }
 
+  // 初始化canvas大小
   private initCanvasSize(options: CanvasEngineProps) {
     const { w, h, canvasTarget } = options
     const canvasDom = typeof canvasTarget === 'string'
@@ -89,6 +93,7 @@ export class CanvasEngine {
     this.initCanvasDomInfo(options, canvasDom)
   }
 
+  // 初始化canvasDom信息
   private initCanvasDomInfo(options: CanvasEngineProps, _: HTMLCanvasElement) {
     const { w, h } = options
     this.canvasDomInfo.canvasWidth = Number(w || '500')
@@ -96,22 +101,36 @@ export class CanvasEngine {
     this.updateCanvasOffset()
   }
 
+  // 更新canvas的偏移量
   public updateCanvasOffset() {
     const { left, top } = this.rawCanvasDom.getClientRects()[0]
     this.canvasDomInfo.leftOffset = left
     this.canvasDomInfo.topOffset = top
   }
 
+  /**
+   * @author Zhao YuanDa
+   * @parms:
+   * @description: //排序一下渲染队列 根据zIndex属性
+   * @date 2022-08-07 10:55
+   */
   private sortRenderQueue() {
     this.renderQueue.sort((a, b) => {
       return a.graphical.zIndex - b.graphical.zIndex
     })
   }
 
+  // 获取2d的上下文环境
   private initCtx() {
     this.ctx = this.rawCanvasDom.getContext('2d') as CanvasRenderingContext2D
   }
 
+  /**
+   * @author Zhao YuanDa
+   * @parms:
+   * @description: //TODO
+   * @date 2022-08-07 11:20
+   */
   private renderingQueue() {
     this.sortRenderQueue()
     this.renderQueue.forEach((render) => {
@@ -121,10 +140,22 @@ export class CanvasEngine {
     })
   }
 
+  /**
+   * @author Zhao YuanDa
+   * @parms:
+   * @description: //TODO
+   * @date 2022-08-07 11:21
+   */
   public getCanvasDom(): HTMLCanvasElement {
     return this.rawCanvasDom
   }
 
+  /**
+   * @author Zhao YuanDa
+   * @parms:
+   * @description: //渲染模块入口函数
+   * @date 2022-08-07 11:18
+   */
   public render(
     graphical: ShapeClassType,
     options: RenderOptions['options'],
@@ -141,6 +172,12 @@ export class CanvasEngine {
     this.runRenderTask()
   }
 
+  /**
+   * @author Zhao YuanDa
+   * @parms: 事件的作用目标图形 事件名 事件处理函数
+   * @description: //TODO
+   * @date 2022-08-07 10:59
+   */
   public addEventListener(
     graphical: ShapeClassType,
     eventType: EventName,
@@ -149,6 +186,12 @@ export class CanvasEngine {
     return this.eventHandler.pushEvent(graphical, eventType, fn)
   }
 
+  /**
+   * @author Zhao YuanDa
+   * @parms:
+   * @description: //TODO
+   * @date 2022-08-07 11:21
+   */
   public clear(graphical: ShapeClassType) {
     const index = this.renderQueue.findIndex(
       it => it.graphical.id === graphical.id,
@@ -159,6 +202,12 @@ export class CanvasEngine {
     this.runRenderTask()
   }
 
+  /**
+   * @author Zhao YuanDa
+   * @parms:
+   * @description: //TODO
+   * @date 2022-08-07 11:21
+   */
   public emptyEvents(graphical: ShapeClassType) {
     const { events } = graphical
     Object.keys(events).forEach((eventName) => {
@@ -166,10 +215,22 @@ export class CanvasEngine {
     })
   }
 
+  /**
+   * @author Zhao YuanDa
+   * @parms:
+   * @description: //TODO
+   * @date 2022-08-07 11:21
+   */
   public clearEvents(graphical: ShapeClassType, eventType: EventName) {
     this.eventHandler.removeListener(graphical, eventType)
   }
 
+  /**
+   * @author Zhao YuanDa
+   * @parms:
+   * @description: //TODO
+   * @date 2022-08-07 11:21
+   */
   public reload() {
     this.clearView()
     this.renderingQueue()
@@ -185,6 +246,12 @@ export class CanvasEngine {
     this.runRenderTask()
   }
 
+  /**
+   * @author Zhao YuanDa
+   * @parms:
+   * @description: //异步渲染
+   * @date 2022-08-07 10:57
+   */
   private runRenderTask() {
     if (!this.isRender) {
       this.isRender = true
