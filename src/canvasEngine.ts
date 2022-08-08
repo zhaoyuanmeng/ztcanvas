@@ -76,11 +76,12 @@ export class CanvasEngine {
   // 初始化canvas大小
   private initCanvasSize(options: CanvasEngineProps) {
     const { w, h, canvasTarget } = options
-    const canvasDom = typeof canvasTarget === 'string'
-      ? (document.querySelector(
-          canvasTarget || '#canvas',
-        ) as HTMLCanvasElement)
-      : canvasTarget
+    const canvasDom
+      = typeof canvasTarget === 'string'
+        ? (document.querySelector(
+            canvasTarget || '#canvas',
+          ) as HTMLCanvasElement)
+        : canvasTarget
 
     if (canvasDom) {
       canvasDom.setAttribute('width', w || '500')
@@ -132,10 +133,13 @@ export class CanvasEngine {
    * @date 2022-08-07 11:20
    */
   private renderingQueue() {
+    // 先按照z-index排序
     this.sortRenderQueue()
     this.renderQueue.forEach((render) => {
       render.graphical.innerZIndex = ++this.maxZIndex
+      // 渲染前做的事 这个没有写呢
       render.graphical.beforeRender(this, render.options)
+      // 真正开始渲染
       render.graphical.render(this, render.options)
     })
   }
@@ -228,7 +232,7 @@ export class CanvasEngine {
   /**
    * @author Zhao YuanDa
    * @parms:
-   * @description: //TODO
+   * @description: //加载函数（包括重新加载）
    * @date 2022-08-07 11:21
    */
   public reload() {
@@ -249,7 +253,7 @@ export class CanvasEngine {
   /**
    * @author Zhao YuanDa
    * @parms:
-   * @description: //异步渲染
+   * @description: //异步渲染 跟vue3 里面nextTick类似
    * @date 2022-08-07 10:57
    */
   private runRenderTask() {

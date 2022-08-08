@@ -3,10 +3,13 @@ import type { baseShape } from '../types'
 /**
  * @author Zhao YuanDa
  * @parms:
- * @description: //返回一个函数
+ * @description:
  * @date 2022-08-07 11:11
  */
-export function getCanvasCheckApi(ctx: CanvasRenderingContext2D, renderMode: baseShape['renderMode'] = 'fill') {
+export function getCanvasCheckApi(
+  ctx: CanvasRenderingContext2D,
+  renderMode: baseShape['renderMode'] = 'fill',
+) {
   const mapping = {
     fill: ctx.isPointInPath,
     stroke: ctx.isPointInStroke,

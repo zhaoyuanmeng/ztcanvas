@@ -20,9 +20,9 @@ export class ClickEventHandler extends BaseEventHandler {
    * @date 2022-08-07 10:02
    */
   track(shape: ShapeClassType, cbFn: EventFn): void {
-    // 刚进来的时候 先初始化监听
+    // 刚进来的时候 先初始化监听 然后排序z-index 并且建立好了
     if (!this.events.length) this.initDomEventListener()
-    // 然后调用tirgger函数
+    // 然后调用tirgger函数 这个函数目的是为了得到 事件处理函数
     const fn = this.trigger(shape, cbFn)
     // 然后存放到公用的events中
     this.events.push({
@@ -34,7 +34,7 @@ export class ClickEventHandler extends BaseEventHandler {
   /**
    * @author Zhao YuanDa
    * @parms:
-   * @description: //事件触发函数  返回一个函数 这个函数就是事件回调函数
+   * @description:
    * @date 2022-08-07 10:02
    */
   trigger(shape: ShapeClassType, cbFn: EventFn): TriggerReturnType {

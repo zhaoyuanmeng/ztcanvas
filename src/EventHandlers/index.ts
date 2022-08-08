@@ -1,15 +1,11 @@
 import type { CanvasEngine } from '../canvasEngine'
-import type {
-  EventFn,
-  EventName,
-  ShapeClassType,
-} from '../types'
+import type { EventFn, EventName, ShapeClassType } from '../types'
 import type { BaseEventHandler } from './base'
 import { ClickEventHandler } from './click'
 
 // 索引形式 TODO:书写key:事件名 value：事件的操作
 type HandlerInstanceCache = {
-  [key in EventName]: BaseEventHandler
+  [key in EventName]: BaseEventHandler;
 }
 
 export class EventHandler {
@@ -65,7 +61,9 @@ export class EventHandler {
     const eventSet = shape.events[evtName]
     if (!eventSet) return
     const handlerInstance = this.handlerInstances[evtName]
-    handlerInstance.events = handlerInstance.events.filter(e => e.shape.id !== shape.id)
+    handlerInstance.events = handlerInstance.events.filter(
+      e => e.shape.id !== shape.id,
+    )
     eventSet.clear()
     handlerInstance.checkEmpty()
   }

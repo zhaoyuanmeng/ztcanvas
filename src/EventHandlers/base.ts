@@ -1,10 +1,20 @@
 import type { CanvasEngine } from '../canvasEngine'
 import { warn } from '../helper/warn'
-import type { EventFn, EventName, ShapeClassType, ValidEventType } from '../types'
+import type {
+  EventFn,
+  EventName,
+  ShapeClassType,
+  ValidEventType,
+} from '../types'
 
-interface ShouldTriggerEvent { shape: ShapeClassType; handler: EventFn }
+interface ShouldTriggerEvent {
+  shape: ShapeClassType
+  handler: EventFn
+}
 
-export type TriggerReturnType = (event: ValidEventType) => false | ShouldTriggerEvent
+export type TriggerReturnType = (
+  event: ValidEventType
+) => false | ShouldTriggerEvent
 
 export interface EventBase {
   shape: ShapeClassType
@@ -36,26 +46,36 @@ export abstract class BaseEventHandler {
    * @param cbFn 事件的处理函数
    * @returns TriggerReturnType 返回一个函数或者 false
    */
-  protected abstract trigger(shape: ShapeClassType, cbFn: EventFn): TriggerReturnType
+  protected abstract trigger(
+    shape: ShapeClassType,
+    cbFn: EventFn
+  ): TriggerReturnType
 
   /**
-   * 初始化的时候，为 canvas dom 添加对应的事件监听
+   * 初始化的时候，为 canvas dom 添加对应的事件监听 这里就做好了排序
    */
   protected initDomEventListener() {
     const dom = this.engine.getCanvasDom()
+    // 这个是个异步的 等到这执行的时候会先执行后面的trigger 等到真正监听的时候这时候events里面就有值了 因为这是个回调函数
     this.domEventListener = (e: ValidEventType) => {
-      // 根据 shape.zIndex 进行排序，然后只需要触发图层最大的那一个就好了
+      // 根据 shape.zIndex 进行排序，然后只需要触发图层最大的那一个就好了 这里拿的是trigger里面返回的
       const shouldTriggerEvents: ShouldTriggerEvent[] = []
+
+      // ========== 这就是核心代码
       this.events.forEach((i) => {
         const res = i.handler(e)
         if (res) shouldTriggerEvents.push(res)
       })
-      shouldTriggerEvents.sort((a, b) => b.shape.innerZIndex - a.shape.innerZIndex)
+      shouldTriggerEvents.sort(
+        (a, b) => b.shape.innerZIndex - a.shape.innerZIndex,
+      )
+      // ===============end
       if (shouldTriggerEvents.length) {
         const { handler } = shouldTriggerEvents[0]
         handler(e)
       }
     }
+    // 这个触发的时候 this.domEventListener里面都存在值了
     dom.addEventListener(this.eventName, this.domEventListener)
   }
 
@@ -65,8 +85,7 @@ export abstract class BaseEventHandler {
    */
   removeListener(fn: EventFn) {
     const index = this.events.findIndex(evt => evt.handler === fn)
-    if (index === -1)
-      return warn(`${this.eventName} 事件监听函数不存在`)
+    if (index === -1) return warn(`${this.eventName} 事件监听函数不存在`)
     this.events.splice(index, 1)
   }
 
