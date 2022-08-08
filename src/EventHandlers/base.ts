@@ -75,7 +75,7 @@ export abstract class BaseEventHandler {
         handler(e)
       }
     }
-    // 这个触发的时候 this.domEventListener里面都存在值了
+    // 这个触发的时候 this.domEventListener里面都存在值了 都是给整体的dom添加事件
     dom.addEventListener(this.eventName, this.domEventListener)
   }
 

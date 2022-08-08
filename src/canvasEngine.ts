@@ -136,6 +136,7 @@ export class CanvasEngine {
     // 先按照z-index排序
     this.sortRenderQueue()
     this.renderQueue.forEach((render) => {
+      // 这里是为了保证有个最上面的图层
       render.graphical.innerZIndex = ++this.maxZIndex
       // 渲染前做的事 这个没有写呢
       render.graphical.beforeRender(this, render.options)

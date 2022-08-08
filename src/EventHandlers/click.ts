@@ -34,7 +34,7 @@ export class ClickEventHandler extends BaseEventHandler {
   /**
    * @author Zhao YuanDa
    * @parms:
-   * @description:
+   * @description:这个里面也做到了位置是否再里面的判断
    * @date 2022-08-07 10:02
    */
   trigger(shape: ShapeClassType, cbFn: EventFn): TriggerReturnType {

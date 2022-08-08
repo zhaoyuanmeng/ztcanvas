@@ -15,7 +15,14 @@ export interface ImageCanvas {
 export class Img extends BaseShape<RectShape, ImageCanvas> {
   shapeInfo = {} as RectShape & ImageCanvas
   id = Symbol('ImageCanvas')
-  constructor(x: number, y: number, w: number, h: number, src: string, zIndex: number)
+  constructor(
+    x: number,
+    y: number,
+    w: number,
+    h: number,
+    src: string,
+    zIndex: number
+  )
   constructor(options: ImageCanvas)
   constructor(
     options: ImageCanvas | number,
@@ -93,7 +100,13 @@ export class Img extends BaseShape<RectShape, ImageCanvas> {
     image.onload = () => {
       canvasEngine.ctx.fillStyle = 'rgba(0,0,0,0)'
       canvasEngine.ctx.fill(this.path2D)
-      canvasEngine.ctx.drawImage(image, this.shapeInfo.x, this.shapeInfo.y, this.shapeInfo.w, this.shapeInfo.h)
+      canvasEngine.ctx.drawImage(
+        image,
+        this.shapeInfo.x,
+        this.shapeInfo.y,
+        this.shapeInfo.w,
+        this.shapeInfo.h,
+      )
     }
   }
 }
