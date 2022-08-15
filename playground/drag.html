@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>mouse event</title>
+		<style>
+			body, div {
+				margin: 0;
+                padding: 0;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="cas">
+			<canvas id="cs" width="800" height="600" style="border: 2px solid green"></canvas>
+		</div>
+		
+		<script type="text/javascript">
+			let canvas = document.getElementById("cs");
+			// 获取canvas的宽高
+			let width = canvas.width;
+			let height = canvas.height;
+			
+			let ctx = canvas.getContext("2d");
+			let now = {x: 0, y: 0};  // 鼠标的位置
+			let pos = {x1: 0, y1: 0, x2: 0, y2: 0, x3: 0, y3: 0, x4: 0, y4: 0};  // 图片起始点的位置，这里默认(x1, y1)为(0, 0)
+			// 鼠标按下、鼠标移动和鼠标松开是两个分散的动作，现在要取它两的交集且有顺序，
+			// 即：鼠标按下、鼠标移动和鼠标松开，将其认为是一个动作。
+			
+			let isDown = false;  
+			
+			// 创建img元素
+			let img = document.createElement("img")
+			// 设置它的src，这样图片会被加载
+			img.src = "./assets/zu.png";
+			img.style.position = "absolute"
+			// 当图片加载完成之后，将其绘制到canvas上
+			// 如果没有这句话，图片绘制可能不会发生，因为图片未加载时为空。
+			img.onload = () => {
+				drawCanvas(img, "#FFFFFF");
+				// 更新图片的起始点
+				updatePos(pos.x1, pos.y1);
+			};
+			
+			// 添加鼠标事情，来实现图片的拖放功能。
+			// 当鼠标按下时，获取当前的坐标
+			canvas.onmousedown = e => {
+				isDown = true;     // 鼠标按下时，设置isDown为true，此时移动鼠标才认为是有效。
+				console.log("鼠标按下")
+				let x = e.pageX-canvas.offsetLeft;     // 后面这个是偏移量，但是在这里为0
+				let y = e.pageY-canvas.offsetTop;
+				now.x = x;
+				now.y = y;
+				console.log(x + " -> " + y);
+				
+				if (!ctx.isPointInPath(x, y)) {
+					console.log("鼠标没在路径内");
+					return;
+				}
+
+				drawCanvas(img, "red");
+			};
+			
+			// 在鼠标移动时，不断重绘制整个canvas
+			canvas.onmousemove = e => {
+				if (!isDown) {  // 鼠标未按下则直接返回，不去响应该事件。
+					return;
+				}
+
+				// 获取点的坐标可以封装成函数
+				let x = e.pageX;
+				let y = e.pageY;
+				
+				console.log(x + " " + y);
+				if (!ctx.isPointInPath(x, y)) {
+					console.log("鼠标没在路径内");
+					return;
+				}
+				// 这里需要限制鼠标不能越过界限的问题，图片移动到界面外的效果不好
+				
+				// 清空当前的canvas图形
+				ctx.clearRect(0, 0, canvas.width, canvas.height);
+				
+				// 计算图片的绘制起点的变化位置
+				pos.x1 = pos.x1 + (x-now.x);
+				pos.y1 = pos.y1 + (y-now.y);
+				// 更新其它点的位置
+				updatePos(pos.x1, pos.y1);
+				// 判断四个点的位置情况，不能越界
+				judgePosition();
+				
+				// 重绘制偏移之后的canvas
+				ctx.drawImage(img, pos.x1, pos.y1);
+				
+				ctx.beginPath();
+				ctx.strokeStyle="red";
+				ctx.rect(pos.x1, pos.y1, img.width, img.height);  
+				ctx.stroke();
+				
+				now.x = x; now.y = y;
+				console.log("鼠标在移动..." + x + " --> " + y);
+			}
+
+			canvas.onmouseup = e => {
+				isDown = false;  // 鼠标松开，则上述封装的动作结束。
+				console.log("鼠标松开");
+				drawCanvas(img, "#FFFFFF");
+			}
+			
+			// 如果鼠标按下然后移动的过程中离开了当前元素，再松开，但是无法触发鼠标松开事件了，
+			// 所以当监听到鼠标移出元素时，必须也要将isDown设置成false。
+			canvas.onmouseout = e => {
+				isDown = false;
+				console.log("鼠标离开了画布元素");
+				drawCanvas(img, "#FFFFFF");
+				// 判断四个点的位置情况，不能越界
+				judgePosition();
+				// 重绘制偏移之后的canvas
+				ctx.drawImage(img, pos.x1, pos.y1);
+			}
+			
+			function drawCanvas(img, color) {
+				ctx.clearRect(0, 0, canvas.width, canvas.height);   // 清空当前的canvas图形
+			    ctx.drawImage(img, pos.x1, pos.y1);   // 这里不应该使用全局变量传参数的。
+				ctx.beginPath();
+				ctx.strokeStyle=color;
+				ctx.rect(pos.x1, pos.y1, img.width, img.height);
+				ctx.stroke();
+			}
+			
+			// 因为图片是矩形，所以只要知道一点就可以确定其余四点了，
+			// 这里我们取 (x1,y1)，即左上角的点，这样比较方便。
+			// 因为x1，y1也在改变，所以需要先更新x1，y1.
+			function updatePos(x, y) {
+			console.log("传入的参数值：", x, y);
+			    pos.x1 = x;
+				pos.y1 = y;
+				pos.x2 = x + img.width; 
+				pos.y2 = y;
+				pos.x3 = x + img.width;
+				pos.y3 = y + img.height;
+				pos.x4 = x;
+				pos.y4 = y + img.height;
+			}
+			
+			// 判断位置，当点越界时，进行处理
+			function judgePosition() {
+				// 先看一下点的规则
+				console.log("judgePosition:", pos);
+				
+				// 单边出界的情况和两边出界共三种情况
+				// 只要保证左上角和右下角的三种情况都不出界，所有情况都不会出界了。
+				if (pos.x1 < 0 && pos.y1 > 0) {
+					updatePos(0, pos.y1);
+				} else if (pos.x1 > 0 && pos.y1 < 0) {
+					updatePos(pos.x1, 0);
+				} else if (pos.x1 < 0 && pos.y1 < 0) {
+					updatePos(0, 0)
+				} else if (pos.x3 > width && pos.y3 < height) {
+					updatePos(width-img.width, pos.y3-img.height);
+				} else if (pos.x3 < width && pos.y3 > height) {
+					updatePos(pos.x3-img.width, height-img.height);
+				} else if (pos.x3 > width && pos.y3 > height) {
+					updatePos(width-img.width, height-img.height);
+				}
+			}
+		</script>
+	</body>
+</html>

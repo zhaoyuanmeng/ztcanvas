@@ -1,13 +1,12 @@
 # ZTCanvas
 
-a lightweight but powerful Canvas Engine
 
-you can click 👇 to access our docs
 
-[ztcanvas docs](https://ztcanvas.netlify.app/)
 
-## features
+## 需要做拖拽的效果
 
-- ⛔️ fully type supported (by using TypeScript)
-- ⚡️ build your Canvas Application Fast and Easy
-- 🛠️ rich api and features
+- 需要哪些数据
+
+- 需要哪些事件
+
+- 基本思路

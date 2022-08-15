@@ -76,6 +76,10 @@ export class CanvasEngine {
   // 初始化canvas大小
   private initCanvasSize(options: CanvasEngineProps) {
     const { w, h, canvasTarget } = options
+    console.log(w,h);
+    console.log(w,h);
+    console.log(w,h);
+    
     const canvasDom
       = typeof canvasTarget === 'string'
         ? (document.querySelector(
